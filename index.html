@@ -37,9 +37,9 @@
     <div class="add-section">
       <div class="section-label">Add Link</div>
       <div class="form-row">
-        <input type="text" id="inputLabel" placeholder="Label (optional — e.g. 'read later', 'buy this')" />
+        <input type="text" id="inputLabel" placeholder="Label (optional)" />
       </div>
-      <div class="form-row">
+      <div class="form-row url-row">
         <input type="url" id="inputUrl" placeholder="https://..." />
         <button class="btn btn-add" id="addBtn" onclick="addLink()">+ Add</button>
       </div>
@@ -47,9 +47,10 @@
 
     <div class="search-row">
       <span class="search-icon">⌕</span>
-      <input type="text" id="searchInput" placeholder="Filter links..." oninput="renderTable()" />
+      <input type="text" id="searchInput" placeholder="Filter links..." />
     </div>
 
+    <!-- DESKTOP: table view -->
     <div class="table-wrap">
       <table>
         <thead>
@@ -71,7 +72,13 @@
       </div>
     </div>
 
+    <!-- MOBILE: card view -->
+    <div id="cardList"></div>
+
   </main>
+
+  <!-- PAGINATION sticky bar -->
+  <div id="pagination"></div>
 
   <div id="toast"></div>
 

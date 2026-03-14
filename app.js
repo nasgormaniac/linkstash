@@ -2,10 +2,12 @@
    LinkStash — app.js
    ============================================================ */
 
-const API = '/api/links';
+const API          = '/api/links';
+const PAGE_SIZE    = 10;
 
 let links     = [];
 let editingId = null;
+let currentPage = 1;
 
 
 /* ── THEME ───────────────────────────────────────────────── */
@@ -18,7 +20,6 @@ function setTheme(t) {
   });
 }
 
-// Apply saved theme immediately on load
 setTheme(localStorage.getItem('ls_theme') || 'nightfall');
 
 
@@ -28,8 +29,9 @@ async function fetchLinks() {
   try {
     const res = await fetch(API);
     links = await res.json();
+    editingId = null;
     setStatus(true, `${links.length} link${links.length !== 1 ? 's' : ''}`);
-    renderTable();
+    renderAll();
   } catch {
     setStatus(false, 'server offline');
     document.getElementById('tableBody').innerHTML = `
@@ -40,6 +42,11 @@ async function fetchLinks() {
           </div>
         </td>
       </tr>`;
+    document.getElementById('cardList').innerHTML = `
+      <div style="text-align:center;padding:40px;font-family:var(--mono);font-size:12px;color:var(--danger)">
+        Cannot connect — run: <strong>python server.py</strong>
+      </div>`;
+    document.getElementById('pagination').innerHTML = '';
   }
 }
 
@@ -48,8 +55,8 @@ async function addLink() {
   const labelEl = document.getElementById('inputLabel');
   const addBtn  = document.getElementById('addBtn');
 
-  let url       = urlEl.value.trim();
-  const label   = labelEl.value.trim();
+  let url     = urlEl.value.trim();
+  const label = labelEl.value.trim();
 
   if (!url) { urlEl.focus(); return; }
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
@@ -66,6 +73,7 @@ async function addLink() {
     urlEl.value   = '';
     labelEl.value = '';
     urlEl.focus();
+    currentPage = 1;   // jump to first page on new add
     await fetchLinks();
     toast('Link saved ✓');
   } catch {
@@ -77,6 +85,11 @@ async function addLink() {
 async function deleteLink(id) {
   try {
     await fetch(`${API}/${id}`, { method: 'DELETE' });
+    // if we deleted the last item on a page, go back one
+    const q        = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = getFiltered(q);
+    const total    = Math.ceil((filtered.length - 1) / PAGE_SIZE);
+    if (currentPage > total && total > 0) currentPage = total;
     await fetchLinks();
     toast('Deleted');
   } catch {
@@ -88,8 +101,8 @@ async function saveEdit(id) {
   const link = links.find(l => l.id === id);
   if (!link) return;
 
-  let url      = document.getElementById(`edit-url-${id}`).value.trim();
-  const label  = document.getElementById(`edit-label-${id}`).value.trim();
+  let url     = document.getElementById(`edit-url-${id}`).value.trim();
+  const label = document.getElementById(`edit-label-${id}`).value.trim();
 
   if (!url) return;
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
@@ -115,7 +128,7 @@ async function saveEdit(id) {
 
 function startEdit(id) {
   editingId = id;
-  renderTable();
+  renderAll();
   setTimeout(() => {
     const el = document.getElementById(`edit-url-${id}`);
     if (el) el.focus();
@@ -124,7 +137,55 @@ function startEdit(id) {
 
 function cancelEdit() {
   editingId = null;
-  renderTable();
+  renderAll();
+}
+
+
+/* ── PAGINATION ──────────────────────────────────────────── */
+
+function goToPage(p) {
+  currentPage = p;
+  renderAll();
+  // scroll to top of list smoothly
+  document.querySelector('.table-wrap, #cardList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderPagination(totalItems) {
+  const el         = document.getElementById('pagination');
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+
+  if (totalPages <= 1) {
+    el.innerHTML = '';
+    return;
+  }
+
+  const p = currentPage;
+
+  // Build page number list: always show first, last, current ±1, with ... gaps
+  const pages = new Set([1, totalPages, p, p - 1, p + 1].filter(n => n >= 1 && n <= totalPages));
+  const sorted = [...pages].sort((a, b) => a - b);
+
+  let btns = '';
+
+  // Prev button
+  btns += `<button class="page-btn page-nav" onclick="goToPage(${p - 1})" ${p === 1 ? 'disabled' : ''}>&#8592;</button>`;
+
+  let prev = 0;
+  for (const n of sorted) {
+    if (n - prev > 1) btns += `<span class="page-ellipsis">…</span>`;
+    btns += `<button class="page-btn ${n === p ? 'active' : ''}" onclick="goToPage(${n})">${n}</button>`;
+    prev = n;
+  }
+
+  // Next button
+  btns += `<button class="page-btn page-nav" onclick="goToPage(${p + 1})" ${p === totalPages ? 'disabled' : ''}>&#8594;</button>`;
+
+  // Page info
+  const from = (p - 1) * PAGE_SIZE + 1;
+  const to   = Math.min(p * PAGE_SIZE, totalItems);
+  const info = `<span class="page-info">${from}–${to} of ${totalItems}</span>`;
+
+  el.innerHTML = `<div class="pagination-inner">${btns}${info}</div>`;
 }
 
 
@@ -134,7 +195,6 @@ function copyUrl(url) {
   navigator.clipboard.writeText(url)
     .then(() => toast('Copied ✓'))
     .catch(() => {
-      // Fallback for browsers without clipboard API
       const ta = document.createElement('textarea');
       ta.value = url;
       document.body.appendChild(ta);
@@ -154,16 +214,16 @@ function setStatus(ok, text) {
 }
 
 
-/* ── RENDER ──────────────────────────────────────────────── */
+/* ── HELPERS ─────────────────────────────────────────────── */
 
 function formatDate(iso) {
   const d    = new Date(iso);
   const now  = new Date();
   const diff = now - d;
 
-  if (diff < 60_000)     return 'just now';
-  if (diff < 3_600_000)  return Math.floor(diff / 60_000) + 'm ago';
-  if (diff < 86_400_000) return Math.floor(diff / 3_600_000) + 'h ago';
+  if (diff < 60_000)      return 'just now';
+  if (diff < 3_600_000)   return Math.floor(diff / 60_000) + 'm ago';
+  if (diff < 86_400_000)  return Math.floor(diff / 3_600_000) + 'h ago';
   if (diff < 604_800_000) return Math.floor(diff / 86_400_000) + 'd ago';
 
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
@@ -178,26 +238,65 @@ function getDisplayUrl(url) {
   }
 }
 
-function renderTable() {
-  const q        = document.getElementById('searchInput').value.toLowerCase();
-  const filtered = links.filter(l =>
+function getFiltered(q) {
+  return links.filter(l =>
     l.url.toLowerCase().includes(q) ||
     (l.label && l.label.toLowerCase().includes(q))
   );
+}
 
+function getPage(filtered) {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  // clamp currentPage in case items were deleted
+  if (currentPage > total) currentPage = Math.max(1, total);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  return filtered.slice(start, start + PAGE_SIZE);
+}
+
+function esc(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function escJs(s) {
+  return String(s || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'");
+}
+
+
+/* ── RENDER ──────────────────────────────────────────────── */
+
+function renderAll() {
+  const q        = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = getFiltered(q);
+  const paged    = getPage(filtered);
+
+  renderTable(paged, filtered.length, q);
+  renderCards(paged, filtered.length, q);
+  renderPagination(filtered.length);
+}
+
+
+/* ── TABLE VIEW (desktop) ────────────────────────────────── */
+
+function renderTable(paged, total, q) {
   const body  = document.getElementById('tableBody');
   const empty = document.getElementById('emptyState');
 
-  if (filtered.length === 0) {
+  if (paged.length === 0) {
     body.innerHTML = '';
     empty.style.display = 'block';
-    empty.querySelector('.empty-title').textContent = q ? 'No matches'           : 'No links yet';
+    empty.querySelector('.empty-title').textContent = q ? 'No matches'              : 'No links yet';
     empty.querySelector('.empty-sub').textContent   = q ? 'Try a different keyword' : 'Paste a URL above to stash it';
     return;
   }
 
   empty.style.display = 'none';
-  body.innerHTML = filtered.map(link => {
+  body.innerHTML = paged.map(link => {
     if (editingId === link.id) {
       return `
         <tr class="editing">
@@ -246,6 +345,64 @@ function renderTable() {
 }
 
 
+/* ── CARD VIEW (mobile) ──────────────────────────────────── */
+
+function renderCards(paged, total, q) {
+  const cardList = document.getElementById('cardList');
+
+  if (paged.length === 0) {
+    cardList.innerHTML = `
+      <div id="cardEmpty">
+        <div class="empty-icon">🔗</div>
+        <div class="empty-title">${q ? 'No matches' : 'No links yet'}</div>
+        <div class="empty-sub">${q ? 'Try a different keyword' : 'Paste a URL above to stash it'}</div>
+      </div>`;
+    return;
+  }
+
+  cardList.innerHTML = paged.map(link => {
+    if (editingId === link.id) {
+      return `
+        <div class="link-card editing">
+          <div class="card-edit-form">
+            <input class="inline-input label-input"
+              id="edit-label-${link.id}"
+              value="${esc(link.label)}"
+              placeholder="Label (optional)" />
+            <input class="inline-input"
+              id="edit-url-${link.id}"
+              value="${esc(link.url)}"
+              placeholder="https://"
+              onkeydown="if(event.key==='Enter') saveEdit(${link.id}); if(event.key==='Escape') cancelEdit();" />
+            <div class="card-edit-actions">
+              <button class="icon-btn edit"   onclick="saveEdit(${link.id})">save</button>
+              <button class="icon-btn delete" onclick="cancelEdit()">cancel</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="link-card">
+        ${link.label
+          ? `<div class="card-label">${esc(link.label)}</div>`
+          : `<div class="card-no-label">no label</div>`}
+        <a class="card-url"
+          href="${esc(link.url)}"
+          target="_blank"
+          rel="noopener"
+          title="${esc(link.url)}">${esc(getDisplayUrl(link.url))}</a>
+        <div class="card-meta">${formatDate(link.added)}</div>
+        <div class="card-actions">
+          <button class="icon-btn copy"   onclick="copyUrl('${escJs(link.url)}')">copy</button>
+          <button class="icon-btn edit"   onclick="startEdit(${link.id})">edit</button>
+          <button class="icon-btn delete" onclick="deleteLink(${link.id})">del</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+
 /* ── TOAST ───────────────────────────────────────────────── */
 
 let toastTimer;
@@ -259,25 +416,6 @@ function toast(msg) {
 }
 
 
-/* ── UTILS ───────────────────────────────────────────────── */
-
-// Escape for HTML attributes and text content
-function esc(s) {
-  return String(s || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-// Escape for inline JS string literals (single-quoted)
-function escJs(s) {
-  return String(s || '')
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'");
-}
-
-
 /* ── KEYBOARD SHORTCUTS ──────────────────────────────────── */
 
 document.getElementById('inputUrl').addEventListener('keydown', e => {
@@ -288,7 +426,14 @@ document.getElementById('inputLabel').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('inputUrl').focus();
 });
 
+// Reset to page 1 whenever search changes
+document.getElementById('searchInput').addEventListener('input', () => {
+  currentPage = 1;
+  renderAll();
+});
+
 
 /* ── INIT ────────────────────────────────────────────────── */
 
 fetchLinks();
+setInterval(fetchLinks, 1000);
