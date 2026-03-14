@@ -2,7 +2,7 @@
    LinkStash — app.js
    ============================================================ */
 
-const API = 'http://localhost:8765/api/links';
+const API = '/api/links';
 
 let links     = [];
 let editingId = null;

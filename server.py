@@ -2,7 +2,7 @@
 """
 LinkStash - Local server
 Run: python server.py
-Then open: http://localhost:5000
+Then open: http://localhost:8765
 Links are saved to links.json in the same folder.
 """
 
@@ -11,7 +11,7 @@ import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
-PORT = 8765
+PORT = 8765 # or any port, like 5000
 DATA_FILE = os.path.join(os.path.dirname(__file__), "links.json")
 
 
@@ -129,7 +129,8 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    server = HTTPServer(("localhost", PORT), Handler)
+    # server = HTTPServer(("localhost", PORT), Handler)
+    server = HTTPServer(("0.0.0.0", PORT), Handler)
     print(f"\n  LinkStash running at http://localhost:{PORT}")
     print(f"  Links saved to: {DATA_FILE}")
     print(f"  Press Ctrl+C to stop.\n")
