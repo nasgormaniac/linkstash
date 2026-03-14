@@ -21,7 +21,7 @@ python server.py
 ## 📁 Struktur Folder
 ```text
 .
-├── app.js              # JS File for add, edit, delete, filtering
+├── app.js              # JS file for add, edit, delete, filtering
 ├── index.html          # App layout
 ├── server.py           # Python file to run the app
 ├── styles.css          # CSS style for the app style
