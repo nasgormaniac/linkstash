@@ -25,3 +25,8 @@ python server.py
 ├── index.html          # App layout
 ├── server.py           # Python file to run the app
 ├── styles.css          # CSS style for the app style
+```
+
+## ⚠️ Bug
+- Edit and Delete still not working on phone
+- Copy feature on phone must be at least highlight the link so it can copied by manually hold it long enough
