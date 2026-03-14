@@ -1,4 +1,4 @@
-# Linkstash
+# LinkStash
 Simple Note Web App for Saving Link
 
 ## 📌 About
