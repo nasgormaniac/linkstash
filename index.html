@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkStash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&family=DM+Sans:wght@300;400;500&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="nightfall">
+
+  <header>
+    <div class="logo">link<span>/</span>stash</div>
+
+    <div class="header-center">
+      <div class="theme-switcher">
+        <span class="theme-label">Theme</span>
+        <button class="theme-btn" data-t="nightfall"  onclick="setTheme('nightfall')"  title="Nightfall"></button>
+        <button class="theme-btn" data-t="sakura"     onclick="setTheme('sakura')"     title="Sakura"></button>
+        <button class="theme-btn" data-t="ocean"      onclick="setTheme('ocean')"      title="Ocean"></button>
+        <button class="theme-btn" data-t="matcha"     onclick="setTheme('matcha')"     title="Matcha"></button>
+        <button class="theme-btn" data-t="creamsicle" onclick="setTheme('creamsicle')" title="Creamsicle"></button>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="link-count" id="linkCount">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">connecting...</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <div class="add-section">
+      <div class="section-label">Add Link</div>
+      <div class="form-row">
+        <input type="text" id="inputLabel" placeholder="Label (optional — e.g. 'read later', 'buy this')" />
+      </div>
+      <div class="form-row">
+        <input type="url" id="inputUrl" placeholder="https://..." />
+        <button class="btn btn-add" id="addBtn" onclick="addLink()">+ Add</button>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Filter links..." oninput="renderTable()" />
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>URL</th>
+            <th class="col-date">Added</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="4"><div class="loading">loading...</div></td></tr>
+        </tbody>
+      </table>
+      <div class="empty" id="emptyState" style="display:none">
+        <div class="empty-icon">🔗</div>
+        <div class="empty-title">No links yet</div>
+        <div class="empty-sub">Paste a URL above to stash it</div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,608 @@
+/* ============================================================
+   LinkStash — styles.css
+   ============================================================ */
+
+/* ── THEMES ─────────────────────────────────────────────────
+
+   Each theme defines the same set of CSS variables.
+   Applied via data-theme="..." on <body>.
+
+   Variables:
+     --bg            page background
+     --surface       card / table row background
+     --surface2      table header, theme pill background
+     --border        default border colour
+     --border-hover  border on hover
+     --text          primary text
+     --text-dim      secondary / label text
+     --text-muted    placeholder / disabled text
+     --accent        primary action colour (buttons, links)
+     --accent-fg     text on accent background
+     --accent-dim    very faint accent tint (focus rings, row highlight)
+     --danger        destructive action colour
+     --danger-dim    faint danger tint
+     --green         success / online indicator
+     --green-dim     faint green tint
+     --header-bg     sticky header background (with alpha)
+     --row-hover     table row hover background
+     --editing-bg    inline-edit row background
+     --sans          body font stack
+     --mono          monospace font stack
+   ──────────────────────────────────────────────────────────── */
+
+[data-theme="nightfall"] {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface2: #222222;
+  --border: #2a2a2a;
+  --border-hover: #3d3d3d;
+  --text: #e8e8e8;
+  --text-dim: #666666;
+  --text-muted: #3d3d3d;
+  --accent: #f0c040;
+  --accent-fg: #0f0f0f;
+  --accent-dim: rgba(240, 192, 64, 0.12);
+  --danger: #e05050;
+  --danger-dim: rgba(224, 80, 80, 0.1);
+  --green: #50d890;
+  --green-dim: rgba(80, 216, 144, 0.1);
+  --header-bg: rgba(15, 15, 15, 0.95);
+  --row-hover: rgba(255, 255, 255, 0.02);
+  --editing-bg: rgba(240, 192, 64, 0.03);
+  --sans: 'IBM Plex Sans', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+[data-theme="sakura"] {
+  --bg: #fff5f7;
+  --surface: #ffffff;
+  --surface2: #fde8ee;
+  --border: #f5c6d4;
+  --border-hover: #e8a0b8;
+  --text: #3d1a24;
+  --text-dim: #9b6070;
+  --text-muted: #c9a0ae;
+  --accent: #d63d6e;
+  --accent-fg: #ffffff;
+  --accent-dim: rgba(214, 61, 110, 0.08);
+  --danger: #c0392b;
+  --danger-dim: rgba(192, 57, 43, 0.08);
+  --green: #2e7d5a;
+  --green-dim: rgba(46, 125, 90, 0.08);
+  --header-bg: rgba(255, 245, 247, 0.96);
+  --row-hover: rgba(214, 61, 110, 0.03);
+  --editing-bg: rgba(214, 61, 110, 0.04);
+  --sans: 'Quicksand', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+[data-theme="ocean"] {
+  --bg: #f0f7ff;
+  --surface: #ffffff;
+  --surface2: #dceeff;
+  --border: #b8d9f5;
+  --border-hover: #7db8e8;
+  --text: #0d2744;
+  --text-dim: #4a7099;
+  --text-muted: #9bbdd6;
+  --accent: #1a6fc4;
+  --accent-fg: #ffffff;
+  --accent-dim: rgba(26, 111, 196, 0.08);
+  --danger: #c0392b;
+  --danger-dim: rgba(192, 57, 43, 0.08);
+  --green: #0e7c5a;
+  --green-dim: rgba(14, 124, 90, 0.08);
+  --header-bg: rgba(240, 247, 255, 0.96);
+  --row-hover: rgba(26, 111, 196, 0.03);
+  --editing-bg: rgba(26, 111, 196, 0.04);
+  --sans: 'DM Sans', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+[data-theme="matcha"] {
+  --bg: #f4f7f0;
+  --surface: #ffffff;
+  --surface2: #e4eddc;
+  --border: #c5d9b8;
+  --border-hover: #97be84;
+  --text: #1e2d18;
+  --text-dim: #5a7a4a;
+  --text-muted: #a0b890;
+  --accent: #3d7a28;
+  --accent-fg: #ffffff;
+  --accent-dim: rgba(61, 122, 40, 0.08);
+  --danger: #b83232;
+  --danger-dim: rgba(184, 50, 50, 0.08);
+  --green: #2a6e50;
+  --green-dim: rgba(42, 110, 80, 0.1);
+  --header-bg: rgba(244, 247, 240, 0.96);
+  --row-hover: rgba(61, 122, 40, 0.03);
+  --editing-bg: rgba(61, 122, 40, 0.04);
+  --sans: 'DM Sans', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+[data-theme="creamsicle"] {
+  --bg: #fffaf4;
+  --surface: #ffffff;
+  --surface2: #ffebd4;
+  --border: #f5d5b0;
+  --border-hover: #e8b07a;
+  --text: #3d2000;
+  --text-dim: #9a6030;
+  --text-muted: #d4a878;
+  --accent: #d4650a;
+  --accent-fg: #ffffff;
+  --accent-dim: rgba(212, 101, 10, 0.08);
+  --danger: #c0392b;
+  --danger-dim: rgba(192, 57, 43, 0.08);
+  --green: #2e7d5a;
+  --green-dim: rgba(46, 125, 90, 0.08);
+  --header-bg: rgba(255, 250, 244, 0.96);
+  --row-hover: rgba(212, 101, 10, 0.03);
+  --editing-bg: rgba(212, 101, 10, 0.04);
+  --sans: 'Quicksand', sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+
+/* ── RESET ───────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ── BASE ────────────────────────────────────────────────── */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  padding: 0 0 60px;
+  transition: background 0.25s, color 0.25s;
+}
+
+
+/* ── HEADER ──────────────────────────────────────────────── */
+
+header {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  background: var(--header-bg);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+}
+
+.logo {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.logo span {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.link-count {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+
+/* ── THEME SWITCHER ──────────────────────────────────────── */
+
+.theme-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
+.theme-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-right: 2px;
+}
+
+.theme-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.theme-btn:hover           { transform: scale(1.2); }
+.theme-btn.active          { border-color: var(--text); transform: scale(1.15); }
+
+.theme-btn[data-t="nightfall"]   { background: #1a1a1a; box-shadow: inset 0 0 0 3px #f0c040; }
+.theme-btn[data-t="sakura"]      { background: linear-gradient(135deg, #fde8ee 50%, #d63d6e 50%); }
+.theme-btn[data-t="ocean"]       { background: linear-gradient(135deg, #dceeff 50%, #1a6fc4 50%); }
+.theme-btn[data-t="matcha"]      { background: linear-gradient(135deg, #e4eddc 50%, #3d7a28 50%); }
+.theme-btn[data-t="creamsicle"]  { background: linear-gradient(135deg, #ffebd4 50%, #d4650a 50%); }
+
+
+/* ── STATUS DOT ──────────────────────────────────────────── */
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  display: inline-block;
+  margin-right: 5px;
+  transition: background 0.3s;
+}
+
+.status-dot.ok  { background: var(--green); }
+.status-dot.err { background: var(--danger); }
+
+
+/* ── MAIN CONTENT ────────────────────────────────────────── */
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px 24px;
+}
+
+
+/* ── ADD FORM ────────────────────────────────────────────── */
+
+.add-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 24px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.add-section:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+
+/* ── INPUTS ──────────────────────────────────────────────── */
+
+input[type="text"],
+input[type="url"] {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="url"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+
+.btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-add                { background: var(--accent); color: var(--accent-fg); }
+.btn-add:hover          { filter: brightness(1.08); transform: translateY(-1px); }
+.btn-add:active         { transform: translateY(0); }
+.btn-add:disabled       { opacity: 0.4; cursor: not-allowed; transform: none; filter: none; }
+
+.icon-btn {
+  background: none;
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-left: 4px;
+  color: var(--text-dim);
+}
+
+.icon-btn:hover          { border-color: var(--border-hover); }
+.icon-btn.edit:hover     { color: var(--accent);  border-color: var(--accent);  background: var(--accent-dim); }
+.icon-btn.copy:hover     { color: var(--green);   border-color: var(--green);   background: var(--green-dim); }
+.icon-btn.delete:hover   { color: var(--danger);  border-color: var(--danger);  background: var(--danger-dim); }
+
+
+/* ── SEARCH ──────────────────────────────────────────────── */
+
+.search-row {
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.search-row input {
+  width: 100%;
+  padding-left: 36px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+
+/* ── TABLE ───────────────────────────────────────────────── */
+
+.table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  padding: 10px 16px;
+  text-align: left;
+}
+
+th:last-child { text-align: right; }
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  transition: background 0.1s;
+}
+
+tbody tr:last-child  { border-bottom: none; }
+tbody tr:hover       { background: var(--row-hover); }
+
+td {
+  padding: 13px 16px;
+  vertical-align: middle;
+}
+
+.td-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  max-width: 180px;
+}
+
+.label-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-label {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 12px;
+}
+
+.td-url {
+  font-family: var(--mono);
+  font-size: 12px;
+  max-width: 320px;
+}
+
+.url-link {
+  color: var(--accent);
+  text-decoration: none;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.url-link:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+.td-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.td-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+
+/* ── INLINE EDIT ROW ─────────────────────────────────────── */
+
+.editing td { background: var(--editing-bg); }
+
+.inline-input {
+  background: var(--bg);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  outline: none;
+  width: 100%;
+}
+
+.inline-input.label-input {
+  font-family: var(--sans);
+  font-size: 13px;
+}
+
+
+/* ── EMPTY STATE ─────────────────────────────────────────── */
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  background: var(--surface);
+}
+
+.empty-icon  { font-size: 32px; margin-bottom: 10px; }
+.empty-title { font-family: var(--mono); font-size: 13px; margin-bottom: 6px; color: var(--text-dim); }
+.empty-sub   { font-size: 12px; }
+
+
+/* ── LOADING ─────────────────────────────────────────────── */
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--surface);
+}
+
+
+/* ── TOAST ───────────────────────────────────────────────── */
+
+#toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  opacity: 0;
+  z-index: 999;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
+}
+
+#toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  header {
+    padding: 12px 14px;
+    flex-wrap: wrap;
+  }
+
+  .header-center {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 4px;
+  }
+
+  main { padding: 18px 12px; }
+
+  .td-date       { display: none; }
+  th.col-date    { display: none; }
+  .td-label      { max-width: 90px; }
+  .td-url        { max-width: 140px; }
+}
