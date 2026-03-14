@@ -3,7 +3,7 @@ Simple Note Web App for Saving Link
 
 ## 📌 About
 
-Simple web app that is note alike for saving a link. Starting from my habit surfing on internet and i need to save some link, and then open it again, usually regarding content i need to download. Usually i copy paste the link into my personal WhatsApp, txt file, or even Docs file in my Drive. I need something different, more simpler in use and pleasant to look.
+Simple web app that is note alike for saving a link. Starting from my habit surfing on internet and I need to save some link, and then open it again, usually regarding content I need to download. Usually I copy paste the link into my personal WhatsApp, txt file, or even Docs file in my Drive. I need something different, simpler in use and pleasant to look.
 
 ## How to Use
 ### Clone the Project
