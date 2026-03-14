@@ -18,7 +18,7 @@ cd linkstash
 python server.py
 ```
 
-## 📁 Struktur Folder
+## 📁 Folder Structure
 ```text
 .
 ├── app.js              # JS file for add, edit, delete, filtering
