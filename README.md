@@ -28,5 +28,4 @@ python server.py
 ```
 
 ## ⚠️ Bug
-- Edit and Delete still not working on phone
-- Copy feature on phone must be at least highlight the link so it can copied by manually hold it long enough
+- Edit still not working on phone
