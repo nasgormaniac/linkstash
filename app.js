@@ -26,10 +26,13 @@ setTheme(localStorage.getItem('ls_theme') || 'nightfall');
 /* ── API CALLS ───────────────────────────────────────────── */
 
 async function fetchLinks() {
+  if (editingId) return; // don't refresh while editing
   try {
     const res = await fetch(API);
     links = await res.json();
-    editingId = null;
+    if (editingId && !links.find(l => l.id === editingId)) {
+      editingId = null;
+    }
     setStatus(true, `${links.length} link${links.length !== 1 ? 's' : ''}`);
     renderAll();
   } catch {
@@ -195,13 +198,7 @@ function copyUrl(url) {
   navigator.clipboard.writeText(url)
     .then(() => toast('Copied ✓'))
     .catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = url;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      toast('Copied ✓');
+      toast('Long-press the link to copy');
     });
 }
 
@@ -394,9 +391,8 @@ function renderCards(paged, total, q) {
           title="${esc(link.url)}">${esc(getDisplayUrl(link.url))}</a>
         <div class="card-meta">${formatDate(link.added)}</div>
         <div class="card-actions">
-          <button class="icon-btn copy"   onclick="copyUrl('${escJs(link.url)}')">copy</button>
-          <button class="icon-btn edit"   onclick="startEdit(${link.id})">edit</button>
-          <button class="icon-btn delete" onclick="deleteLink(${link.id})">del</button>
+          <button class="icon-btn copy" onclick="copyUrl('${escJs(link.url)}')">copy</button>
+          <button class="icon-btn trash" onclick="deleteLink(${link.id})" title="Delete">🗑</button>
         </div>
       </div>`;
   }).join('');

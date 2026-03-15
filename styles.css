@@ -752,7 +752,7 @@ td {
     margin-top: 4px;
   }
 
-  .card-actions .icon-btn {
+  .card-actions .icon-btn.copy {
     flex: 1;
     text-align: center;
     padding: 9px 0;
@@ -760,6 +760,27 @@ td {
     min-width: 0;
     min-height: 40px;
     border-radius: 8px;
+  }
+
+  /* small trash icon button */
+  .card-actions .icon-btn.trash {
+    flex: 0 0 40px;
+    width: 40px;
+    min-height: 40px;
+    padding: 0;
+    font-size: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-color: var(--border);
+    color: var(--text-muted);
+  }
+
+  .card-actions .icon-btn.trash:active {
+    color: var(--danger);
+    border-color: var(--danger);
+    background: var(--danger-dim);
   }
 
   .card-edit-form {
