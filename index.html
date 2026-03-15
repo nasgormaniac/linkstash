@@ -1,26 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LinkStash</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&family=DM+Sans:wght@300;400;500&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&family=DM+Sans:wght@300;400;500&family=Quicksand:wght@400;500;600&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
+
 <body data-theme="nightfall">
 
   <header>
     <div class="logo">link<span>/</span>stash</div>
 
+    <!-- Mobile dropdown (hidden on desktop via CSS) -->
+    <div class="theme-dropdown" id="themeDropdownBtn" onclick="toggleThemeDropdown()">
+      <div class="theme-dropdown-dot" id="themeDropdownDot"></div>
+      <span class="theme-dropdown-name" id="themeDropdownName">Nightfall</span>
+      <span class="theme-dropdown-arrow">▾</span>
+    </div>
+    <div class="theme-dropdown-panel" id="themeDropdownPanel"></div>
+
     <div class="header-center">
       <div class="theme-switcher">
         <span class="theme-label">Theme</span>
-        <button class="theme-btn" data-t="nightfall"  onclick="setTheme('nightfall')"  title="Nightfall"></button>
-        <button class="theme-btn" data-t="sakura"     onclick="setTheme('sakura')"     title="Sakura"></button>
-        <button class="theme-btn" data-t="ocean"      onclick="setTheme('ocean')"      title="Ocean"></button>
-        <button class="theme-btn" data-t="matcha"     onclick="setTheme('matcha')"     title="Matcha"></button>
+        <button class="theme-btn" data-t="nightfall" onclick="setTheme('nightfall')" title="Nightfall"></button>
+        <button class="theme-btn" data-t="sakura" onclick="setTheme('sakura')" title="Sakura"></button>
+        <button class="theme-btn" data-t="ocean" onclick="setTheme('ocean')" title="Ocean"></button>
+        <button class="theme-btn" data-t="matcha" onclick="setTheme('matcha')" title="Matcha"></button>
         <button class="theme-btn" data-t="creamsicle" onclick="setTheme('creamsicle')" title="Creamsicle"></button>
+        <button class="theme-btn" data-t="lavender-dusk" onclick="setTheme('lavender-dusk')"
+          title="Lavender Dusk"></button>
+        <button class="theme-btn" data-t="mint-breeze" onclick="setTheme('mint-breeze')" title="Mint Breeze"></button>
+        <button class="theme-btn" data-t="slate-pro" onclick="setTheme('slate-pro')" title="Slate Pro"></button>
+        <button class="theme-btn" data-t="sand-dune" onclick="setTheme('sand-dune')" title="Sand Dune"></button>
+        <button class="theme-btn" data-t="rose-gold" onclick="setTheme('rose-gold')" title="Rose Gold"></button>
+        <button class="theme-btn" data-t="forest-ink" onclick="setTheme('forest-ink')" title="Forest Ink"></button>
+        <button class="theme-btn" data-t="cobalt-night" onclick="setTheme('cobalt-night')"
+          title="Cobalt Night"></button>
+        <button class="theme-btn" data-t="mocha-dark" onclick="setTheme('mocha-dark')" title="Mocha Dark"></button>
+        <button class="theme-btn" data-t="aurora-dark" onclick="setTheme('aurora-dark')" title="Aurora Dark"></button>
+        <button class="theme-btn" data-t="grape-soda" onclick="setTheme('grape-soda')" title="Grape Soda"></button>
+        <button class="theme-btn" data-t="steel-blue" onclick="setTheme('steel-blue')" title="Steel Blue"></button>
+        <button class="theme-btn" data-t="ember" onclick="setTheme('ember')" title="Ember"></button>
       </div>
     </div>
 
@@ -62,7 +88,11 @@
           </tr>
         </thead>
         <tbody id="tableBody">
-          <tr><td colspan="4"><div class="loading">loading...</div></td></tr>
+          <tr>
+            <td colspan="4">
+              <div class="loading">loading...</div>
+            </td>
+          </tr>
         </tbody>
       </table>
       <div class="empty" id="emptyState" style="display:none">
@@ -83,5 +113,71 @@
   <div id="toast"></div>
 
   <script src="/app.js"></script>
+  <script>
+    const THEMES = [
+      { id: 'nightfall',    name: 'Nightfall',     grad: 'linear-gradient(135deg,#1a1a1a 50%,#f0c040 50%)' },
+      { id: 'sakura',       name: 'Sakura',         grad: 'linear-gradient(135deg,#fde8ee 50%,#d63d6e 50%)' },
+      { id: 'ocean',        name: 'Ocean',           grad: 'linear-gradient(135deg,#dceeff 50%,#1a6fc4 50%)' },
+      { id: 'matcha',       name: 'Matcha',          grad: 'linear-gradient(135deg,#e4eddc 50%,#3d7a28 50%)' },
+      { id: 'creamsicle',   name: 'Creamsicle',      grad: 'linear-gradient(135deg,#ffebd4 50%,#d4650a 50%)' },
+      { id: 'lavender-dusk',name: 'Lavender Dusk',   grad: 'linear-gradient(135deg,#ede9fe 50%,#7c3aed 50%)' },
+      { id: 'mint-breeze',  name: 'Mint Breeze',     grad: 'linear-gradient(135deg,#ccfbf1 50%,#0d9488 50%)' },
+      { id: 'slate-pro',    name: 'Slate Pro',       grad: 'linear-gradient(135deg,#f1f5f9 50%,#3b82f6 50%)' },
+      { id: 'sand-dune',    name: 'Sand Dune',       grad: 'linear-gradient(135deg,#fef3c7 50%,#b45309 50%)' },
+      { id: 'rose-gold',    name: 'Rose Gold',       grad: 'linear-gradient(135deg,#ffe4de 50%,#e11d48 50%)' },
+      { id: 'forest-ink',   name: 'Forest Ink',      grad: 'linear-gradient(135deg,#dcf5e7 50%,#047857 50%)' },
+      { id: 'cobalt-night', name: 'Cobalt Night',    grad: 'linear-gradient(135deg,#21262d 50%,#58a6ff 50%)' },
+      { id: 'mocha-dark',   name: 'Mocha Dark',      grad: 'linear-gradient(135deg,#2e2420 50%,#e8956d 50%)' },
+      { id: 'aurora-dark',  name: 'Aurora Dark',     grad: 'linear-gradient(135deg,#1a2235 50%,#22d3ee 50%)' },
+      { id: 'grape-soda',   name: 'Grape Soda',      grad: 'linear-gradient(135deg,#fae8ff 50%,#a21caf 50%)' },
+      { id: 'steel-blue',   name: 'Steel Blue',      grad: 'linear-gradient(135deg,#dbe8f4 50%,#1d4ed8 50%)' },
+      { id: 'ember',        name: 'Ember',           grad: 'linear-gradient(135deg,#ffedd5 50%,#c2410c 50%)' },
+    ];
+
+    function buildDropdown() {
+      const panel = document.getElementById('themeDropdownPanel');
+      const cur   = localStorage.getItem('ls_theme') || 'nightfall';
+      panel.innerHTML = THEMES.map(t => `
+        <div class="theme-dropdown-item ${t.id === cur ? 'selected' : ''}"
+             onclick="pickTheme('${t.id}')">
+          <div class="theme-dropdown-item-dot" style="background:${t.grad};"></div>
+          ${t.name}
+          ${t.id === cur ? '<span class="theme-dropdown-item-check">✓</span>' : ''}
+        </div>`).join('');
+    }
+
+    function syncDropdownBtn(id) {
+      const t = THEMES.find(x => x.id === id) || THEMES[0];
+      document.getElementById('themeDropdownDot').style.background = t.grad;
+      document.getElementById('themeDropdownName').textContent = t.name;
+    }
+
+    function toggleThemeDropdown() {
+      const panel = document.getElementById('themeDropdownPanel');
+      buildDropdown();
+      panel.classList.toggle('open');
+    }
+
+    function pickTheme(id) {
+      setTheme(id);
+      syncDropdownBtn(id);
+      buildDropdown();
+      document.getElementById('themeDropdownPanel').classList.remove('open');
+    }
+
+    // Close dropdown when tapping outside
+    document.addEventListener('click', e => {
+      const btn   = document.getElementById('themeDropdownBtn');
+      const panel = document.getElementById('themeDropdownPanel');
+      if (!btn.contains(e.target) && !panel.contains(e.target)) {
+        panel.classList.remove('open');
+      }
+    });
+
+    // Sync on load
+    const _savedTheme = localStorage.getItem('ls_theme') || 'nightfall';
+    syncDropdownBtn(_savedTheme);
+  </script>
 </body>
+
 </html>
