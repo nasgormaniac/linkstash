@@ -2,28 +2,29 @@
 """
 LinkStash — server.py
 Run:  python server.py
-Open: http://localhost:8765  (local)
-   or your ngrok HTTPS URL   (remote / phone)
+Open: http://localhost:8765
 
 Real-time sync via Server-Sent Events (SSE).
-Works behind ngrok with no extra config needed.
+When any client adds/edits/deletes a link, all other
+connected clients receive a "reload" event instantly.
 """
 
 import json
 import os
 import threading
+import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from socketserver import ThreadingMixIn
 from urllib.parse import urlparse
 
 PORT      = 8765
 DATA_FILE = os.path.join(os.path.dirname(__file__), "links.json")
 
-
 # ── SSE subscriber registry ───────────────────────────────
-
+# Each connected SSE client gets a threading.Event.
+# When data changes we set all events; each SSE handler
+# wakes up, sends the "reload" event, then resets.
 _sse_lock        = threading.Lock()
-_sse_subscribers = {}
+_sse_subscribers = {}   # id -> threading.Event
 _sse_counter     = 0
 
 def _register_sse():
@@ -40,6 +41,7 @@ def _unregister_sse(sid):
         _sse_subscribers.pop(sid, None)
 
 def _notify_all():
+    """Wake up every SSE subscriber."""
     with _sse_lock:
         for ev in _sse_subscribers.values():
             ev.set()
@@ -65,10 +67,12 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         print(f"  {args[0]} {args[1]}")
 
+    # ── response helpers ──────────────────────────────────
+
     def send_json(self, data, status=200):
         body = json.dumps(data).encode()
         self.send_response(status)
-        self.send_header("Content-Type",  "application/json")
+        self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", len(body))
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
@@ -78,7 +82,7 @@ class Handler(BaseHTTPRequestHandler):
         with open(path, "rb") as f:
             body = f.read()
         self.send_response(200)
-        self.send_header("Content-Type",  content_type)
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", len(body))
         self.end_headers()
         self.wfile.write(body)
@@ -87,9 +91,11 @@ class Handler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         return json.loads(self.rfile.read(length)) if length else {}
 
+    # ── CORS pre-flight ───────────────────────────────────
+
     def do_OPTIONS(self):
         self.send_response(204)
-        self.send_header("Access-Control-Allow-Origin",  "*")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods",
                          "GET, POST, PUT, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
@@ -100,10 +106,12 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlparse(self.path).path
 
+        # REST
         if path == "/api/links":
             self.send_json(load_links())
             return
 
+        # SSE — long-lived connection, pushes "reload" on data change
         if path == "/api/events":
             sid, event = _register_sse()
             try:
@@ -111,28 +119,32 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header("Content-Type",  "text/event-stream")
                 self.send_header("Cache-Control", "no-cache")
                 self.send_header("Connection",    "keep-alive")
-                self.send_header("X-Accel-Buffering", "no")
                 self.send_header("Access-Control-Allow-Origin", "*")
                 self.end_headers()
 
+                # send an initial heartbeat so the client knows it's connected
                 self.wfile.write(b": connected\n\n")
+                self.wfile.write(b": " + b" " * 2048 + b"\n\n")
                 self.wfile.flush()
 
                 while True:
+                    # wait up to 25 s (keepalive ping interval)
                     triggered = event.wait(timeout=25)
                     if triggered:
                         event.clear()
                         self.wfile.write(b"event: reload\ndata: 1\n\n")
+                        self.wfile.flush()
                     else:
+                        # keepalive comment so proxies don't close the connection
                         self.wfile.write(b": ping\n\n")
-                    self.wfile.flush()
-
-            except (BrokenPipeError, ConnectionResetError, OSError):
-                pass
+                        self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                pass          # client disconnected — normal
             finally:
                 _unregister_sse(sid)
             return
 
+        # Static files
         STATIC = {
             "/":           ("index.html", "text/html; charset=utf-8"),
             "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -175,7 +187,7 @@ class Handler(BaseHTTPRequestHandler):
             updated = self.read_body()
             links   = load_links()
             for i, l in enumerate(links):
-                if int(l["id"]) == link_id:
+                if l["id"] == link_id:
                     links[i] = updated
                     break
             save_links(links)
@@ -191,7 +203,7 @@ class Handler(BaseHTTPRequestHandler):
         parts = self.path.strip("/").split("/")
         if len(parts) == 3 and parts[0] == "api" and parts[1] == "links":
             link_id = int(parts[2])
-            links   = [l for l in load_links() if int(l["id"]) != link_id]
+            links   = [l for l in load_links() if l["id"] != link_id]
             save_links(links)
             _notify_all()
             self.send_json({"deleted": link_id})
@@ -200,16 +212,15 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
 
 
-# ── Threaded server ───────────────────────────────────────
-
-class ThreadedServer(ThreadingMixIn, HTTPServer):
-    daemon_threads = True
-
-
 # ── Entry point ───────────────────────────────────────────
 
 if __name__ == "__main__":
-    server = ThreadedServer(("0.0.0.0", PORT), Handler)
+    # Use ThreadingMixIn so each SSE connection gets its own thread
+    from socketserver import ThreadingMixIn
+    class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+        daemon_threads = True
+
+    server = ThreadedHTTPServer(("0.0.0.0", PORT), Handler)
     print(f"\n  LinkStash running at http://localhost:{PORT}")
     print(f"  Links saved to: {DATA_FILE}")
     print(f"  Press Ctrl+C to stop.\n")

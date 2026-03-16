@@ -429,7 +429,16 @@ document.getElementById('searchInput').addEventListener('input', () => {
 });
 
 
+/* ── REAL-TIME SYNC (SSE) ────────────────────────────────── */
+
+function connectSSE() {
+  const es = new EventSource('/api/events');
+  es.addEventListener('reload', () => { if (!editingId) fetchLinks(); });
+  es.onerror = () => { es.close(); setTimeout(connectSSE, 3000); };
+}
+
+
 /* ── INIT ────────────────────────────────────────────────── */
 
 fetchLinks();
-setInterval(fetchLinks, 1000);
+connectSSE();
